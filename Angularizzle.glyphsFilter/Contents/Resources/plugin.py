@@ -325,7 +325,7 @@ class Angularize(FilterWithDialog):
 					pathTotalLength += totallength
 
 					# check that the distance of curve segment is at least as big as spacebetween jump
-					if totallength > spacebetween:
+					if totallength > spacebetween and spacebetween > 0.01:
 						steps = 20
 						stepinc = totallength / steps
 						steps = int(math.floor(totallength/spacebetween))
