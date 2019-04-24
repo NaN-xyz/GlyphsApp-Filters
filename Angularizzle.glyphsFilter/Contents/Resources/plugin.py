@@ -194,8 +194,7 @@ class Angularize(FilterWithDialog):
 
 	#Clear layer except components
 	def ClearScreen(self, clearlayer):
-		for i in range( len( clearlayer.paths ))[::-1]:
-			del clearlayer.paths[i]
+		clearlayer.paths = None
 
 	def lerp(self, v, d):
 		return v[0] * (1 - d) + v[1] * d
