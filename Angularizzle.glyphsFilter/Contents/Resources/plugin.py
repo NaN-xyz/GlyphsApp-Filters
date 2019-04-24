@@ -10,7 +10,6 @@ import copy
 class Angularize(FilterWithDialog):
 
 	def settings(self):
-
 		self.name = 'Angularizzle'
 		self.menuName = 'Angularizzle'
 		windowWidth = 222
@@ -18,14 +17,12 @@ class Angularize(FilterWithDialog):
 		self.w = Window((windowWidth, windowHeight))
 		self.w.group = Group((0, 0, windowWidth, windowHeight))
 		self.w.group.titlesize = TextBox((20, 20, -10, 17), "Min segment:")
-		self.w.group.inputSize = EditText( (115, 18, 80, 25), "80", callback=self.editTextCallback) 
+		self.w.group.inputSize = EditText((115, 18, 80, 25), "80", callback=self.editTextCallback)
 		self.w.group.checkBox = CheckBox((20, 55, -10, 17), "Keep detail", value=True, callback=self.editTextCallback)
 		self.dialog = self.w.group.getNSView()
 
 	#main filter
 	def filter(self, layer, inEditView, customParameters):
-
-		
 
 		global segsize, detail
 		thisgl = layer
@@ -40,9 +37,9 @@ class Angularize(FilterWithDialog):
 				detail = customParameters.get("detail")
 				print "found custom params ", segsize, detail
 
-				if detail=="True":
+				if detail == "True":
 					detail = True
-				elif detail=="False":
+				elif detail == "False":
 					detail = False
 
 			except:
@@ -52,28 +49,25 @@ class Angularize(FilterWithDialog):
 			segsize = self.w.group.inputSize.get()
 			detail = self.w.group.checkBox.get()
 
-
-
 		segsize = int(segsize)
-
 
 		print "working..."
 
 		global stepnum, tStepSize
 		segsize = int(segsize)
-		stepnum=130
-		tStepSize = 1.0/stepnum # !impt
+		stepnum = 130
+		tStepSize = 1.0 / stepnum # !impt
 		font = Glyphs.font
 		angsize = int(segsize)
 
 		font.disableUpdateInterface()
 
-		if thisgl.paths>0:
+		if thisgl.paths > 0:
 
 			thisgl.color = 8 #purple
 			ang = self.ReturnNodesAlongPath(thisgl.paths, angsize)
 				
-			if detail==False:
+			if detail == False:
 				ang = self.StripDetail(ang, segsize)
 
 			if ang:
@@ -84,7 +78,7 @@ class Angularize(FilterWithDialog):
 					pts = n[2]
 					isclosed = n[1]
 					outline = self.ListToPath(pts, isclosed)
-					thisgl.paths.append( outline )
+					thisgl.paths.append(outline)
 
 			font.enableUpdateInterface()
 
@@ -107,10 +101,10 @@ class Angularize(FilterWithDialog):
 		self.w.group.checkBox.set(Glyphs.defaults['com.LNP.Angularizzle.checkBox'])
 
 	# Action triggered by UI
-	def editTextCallback( self, sender ):
+	def editTextCallback(self, sender):
 		self.update()
 
-	def generateCustomParameter( self ):
+	def generateCustomParameter(self):
 		return "%s; segsize:%s; detail:%s;" % (self.__class__.__name__, Glyphs.defaults['com.LNP.Angularizzle.inputSize'], Glyphs.defaults['com.LNP.Angularizzle.checkBox'])
 
 	def StripDetail (self, nlist, segsize):
@@ -135,7 +129,7 @@ class Angularize(FilterWithDialog):
 					newnodes.append([p1x, p1y])
 					p1x = p2x
 					p1y = p2y
-				else: 
+				else:
 					continue
 
 			nl = [length, isclosed, newnodes]
@@ -143,7 +137,7 @@ class Angularize(FilterWithDialog):
 
 		return newList
 
-	def DoIt( self, sender ):
+	def DoIt(self, sender):
 		segsize = self.w.inputSize.get()
 		detail = self.w.checkBox.get()
 		if int(segsize) > 4:
@@ -161,33 +155,33 @@ class Angularize(FilterWithDialog):
 		ptl.append(ptlist[-1])
 		return ptl
 
-	# the main return t postion on curve script p0,1,2,3 is segment
+	# the main return t postion on curve script p0, 1, 2, 3 is segment
 	def GetPoint(self, p0, p1, p2, p3, t):
 
-		ax = self.lerp( [p0[0], p1[0]], t )
-		ay = self.lerp( [p0[1], p1[1]], t )
-		bx = self.lerp( [p1[0], p2[0]], t )
-		by = self.lerp( [p1[1], p2[1]], t )
-		cx = self.lerp( [p2[0], p3[0]], t )
-		cy = self.lerp( [p2[1], p3[1]], t )
-		dx = self.lerp( [ax, bx], t )
-		dy = self.lerp( [ay, by], t )
-		ex = self.lerp( [bx, cx], t )
-		ey = self.lerp( [by, cy], t )
+		ax = self.lerp([p0[0], p1[0]], t)
+		ay = self.lerp([p0[1], p1[1]], t)
+		bx = self.lerp([p1[0], p2[0]], t)
+		by = self.lerp([p1[1], p2[1]], t)
+		cx = self.lerp([p2[0], p3[0]], t)
+		cy = self.lerp([p2[1], p3[1]], t)
+		dx = self.lerp([ax, bx], t)
+		dy = self.lerp([ay, by], t)
+		ex = self.lerp([bx, cx], t)
+		ey = self.lerp([by, cy], t)
 
-		pointx = self.lerp( [dx, ex], t )
-		pointy = self.lerp( [dy, ey], t )
+		pointx = self.lerp([dx, ex], t)
+		pointy = self.lerp([dy, ey], t)
 
-		calc = [pointx,pointy]
+		calc = [pointx, pointy]
 		return calc
 
-	# Put all the xy coords of linear t GetPoint() increments in list 
-	def CreatePointList(self,p0,p1,p2,p3):
-		pl = list() 
-		tmp=0
-		while tmp<1:
+	# Put all the xy coords of linear t GetPoint() increments in list
+	def CreatePointList(self, p0, p1, p2, p3):
+		pl = list()
+		tmp = 0
+		while tmp < 1:
 			t = tmp
-			calc = self.GetPoint(p0,p1,p2,p3,tmp)
+			calc = self.GetPoint(p0, p1, p2, p3, tmp)
 			pl.append(calc)
 			tmp = tmp + tStepSize
 		return pl
@@ -206,16 +200,16 @@ class Angularize(FilterWithDialog):
 		lookup = list()
 		totallength = 0
 
-		for tp in range (0,len(pointlist)-1):
+		for tp in range (0, len(pointlist) - 1):
 			p1x = pointlist[tp][0]
 			p1y = pointlist[tp][1]
-			p2x = pointlist[tp+1][0]
-			p2y = pointlist[tp+1][1]
+			p2x = pointlist[tp + 1][0]
+			p2y = pointlist[tp + 1][1]
 			dist = math.hypot(p2x - p1x, p2y - p1y)
 			totallength += dist
 			lookup.append(totallength)
 			
-		lookup.insert(0,0)
+		lookup.insert(0, 0)
 
 		return lookup
 
@@ -223,29 +217,29 @@ class Angularize(FilterWithDialog):
 	#return new precise t value between the two indexes desiredlen falls
 	def FindPosInDistList(self, lookup, newlen): #newlen = length along curve
 
-		for s in range (0,len(lookup)-1):
+		for s in range (0, len(lookup) - 1):
 
 			b1 = lookup[s]
-			b2 = lookup[s+1]
+			b2 = lookup[s + 1]
 
 			if b1 <= newlen <= b2:
-				if b1==0:
-					newt=0
+				if b1 == 0:
+					newt = 0
 				else:
-					percentb = ( 100 / (b2 - b1) ) * (newlen - b1)
-					newt = (s*tStepSize) + ( tStepSize * (percentb/100) )
+					percentb = (100 / (b2 - b1)) * (newlen - b1)
+					newt = (s * tStepSize) + (tStepSize * (percentb / 100))
 				return (newt)
 
 	# Draw new angular path from list
 	def ListToPath(self, ptlist, isopen):
 		np = GSPath()
-		if isopen == True and len(ptlist)>2: del ptlist[-1] 
-		if len(ptlist)>2: #so counters don't devolve completely
+		if isopen == True and len(ptlist) > 2: del ptlist[-1]
+		if len(ptlist) > 2: #so counters don't devolve completely
 			for pt in ptlist:
 				newnode = GSNode()
 				newnode.type = GSLINE
 				newnode.position = (pt[0], pt[1])
-				np.nodes.append( newnode )
+				np.nodes.append(newnode)
 			np.closed = isopen
 		return np
 
@@ -259,15 +253,15 @@ class Angularize(FilterWithDialog):
 		currentx = n1x
 		currenty = n1y
 
-		psteps = int(math.ceil(dist/spacebetween))
+		psteps = int(math.ceil(dist / spacebetween))
 
-		stepx = (n2x-n1x) / psteps
-		stepy = (n2y-n1y) / psteps
+		stepx = (n2x - n1x) / psteps
+		stepy = (n2y - n1y) / psteps
 
 		for n in range(psteps):
 			tmplist.append([currentx, currenty])
-			currentx+=stepx
-			currenty+=stepy
+			currentx += stepx
+			currenty += stepy
 
 		return tmplist
 
@@ -280,22 +274,22 @@ class Angularize(FilterWithDialog):
 
 			pathTotalLength = 0
 			allpointslist = []
-			scount=0
+			scount = 0
 			index = -1
 			
-			if path.closed==False:
+			if path.closed == False:
 				continue
 
 			for node in path.nodes:
 	
-				scount+=1
-				index+=1
+				scount += 1
+				index += 1
 				node = path.nodes[index]
 
-				# if straight segment 
-				if node.type == LINE: 
+				# if straight segment
+				if node.type == LINE:
 
-					if scount<1: continue
+					if scount < 1: continue
 
 					prevNode = path.nodes[index - 1]
 
@@ -305,54 +299,53 @@ class Angularize(FilterWithDialog):
 					tp1 = (node.position.x, node.position.y)
 
 					dist = math.hypot(tp1[0] - tp0[0], tp1[1] - tp0[1])
-					pathTotalLength+=dist
-					straightlinepts = self.PointToPointSteps(tp0,tp1,spacebetween)
+					pathTotalLength += dist
+					straightlinepts = self.PointToPointSteps(tp0, tp1, spacebetween)
 					for sl in straightlinepts: allpointslist.append(sl)
-				   
+				
 				# if bezier curve segment
 				elif node.type == CURVE:
-				  
+				
 					prevNode = path.nodes[index - 3]
 
 					tp0 = (prevNode.position.x, prevNode.position.y)
-					tp1 = (path.nodes[index-2].position.x, path.nodes[index-2].position.y)
-					tp2 = (path.nodes[index-1].position.x, path.nodes[index-1].position.y)
+					tp1 = (path.nodes[index - 2].position.x, path.nodes[index - 2].position.y)
+					tp2 = (path.nodes[index - 1].position.x, path.nodes[index - 1].position.y)
 					tp3 = (node.position.x, node.position.y)
 
-					pointlist = self.CreatePointList(tp0, tp1, tp2, tp3) 
-					lookup = self.CreateDistList(pointlist) 
-					totallength = lookup[-1] 
+					pointlist = self.CreatePointList(tp0, tp1, tp2, tp3)
+					lookup = self.CreateDistList(pointlist)
+					totallength = lookup[-1]
 					pathTotalLength += totallength
 
 					# check that the distance of curve segment is at least as big as spacebetween jump
 					if totallength > spacebetween and spacebetween > 0.01:
 						steps = 20
 						stepinc = totallength / steps
-						steps = int(math.floor(totallength/spacebetween))
+						steps = int(math.floor(totallength / spacebetween))
 						stepinc = totallength / steps
-						dlen=0 # distance to check in list of distances
+						dlen = 0 # distance to check in list of distances
 
-						for s in range(0,steps+1):
+						for s in range(0, steps + 1):
 
-							if s==0:
-								newt=0
-							elif s==steps:
-								newt=1
+							if s == 0:
+								newt = 0
+							elif s == steps:
+								newt = 1
 							else:
-								newt = self.FindPosInDistList(lookup,dlen)
+								newt = self.FindPosInDistList(lookup, dlen)
 							
-							calc = self.GetPoint(tp0,tp1,tp2,tp3,newt)
+							calc = self.GetPoint(tp0, tp1, tp2, tp3, newt)
 							allpointslist.append(calc)
 							dlen+=stepinc
 					else:
-						allpointslist.append([tp0[0],tp0[1]])
-						allpointslist.append([tp3[0],tp3[1]])
+						allpointslist.append([tp0[0], tp0[1]])
+						allpointslist.append([tp3[0], tp3[1]])
 
 			if allpointslist:
 				allpointslist = self.RemoveDuplicatePts(allpointslist)
 				pathdata = [pathTotalLength, path.closed, allpointslist]
-				allPaths.append(pathdata) 
+				allPaths.append(pathdata)
 
 		return allPaths
-
 
