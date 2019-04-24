@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleDisplayName</key>
+	<string>Angularizzle</string>
+	<key>CFBundleExecutable</key>
+	<string>plugin</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.LNP.Angularizzle</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Angularizzle</string>
+	<key>CFBundlePackageType</key>
+	<string>BNDL</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>UpdateFeedURL</key>
+	<string>____OnlineUrlToThisPlist____</string>
+	<key>productPageURL</key>
+	<string>https://github.com/LukeProwse/</string>
+	<key>productReleaseNotes</key>
+	<string>Version 1</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright, Luke Prowse 2019</string>
+	<key>NSPrincipalClass</key>
+	<string>Angularize</string>
+	<key>PyMainFileNames</key>
+	<array>
+		<string>../MacOS/main.py</string>
+	</array>
+</dict>
+</plist>
