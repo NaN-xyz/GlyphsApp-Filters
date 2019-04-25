@@ -2,7 +2,7 @@
 
 Hopefully more to come.
 
-## Angularizzle.py
+## Angularizzle Filter
 
 Takes lovingly crafted glyphs and disfigures their curves by sharp line. Visually it has something akin to Illustrator's "Simplify" but is more nuanced (imvfho). The 'Keep detail' option attempts to protect the form's integrity. Unselected it's allowed to devolve down to brutish polygon. Only works with cubic curves so if you import TTFs be sure to convert.
 
