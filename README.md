@@ -8,7 +8,7 @@ Takes lovingly crafted glyphs and disfigures their curves by sharp line. Visuall
 
 Can be used on a glyph-by-glyph basis or across the entire selected font.
 
-Custom parameters can be set to filter on the instance export rather than editing the font directly. Sample:
+Custom parameters can be set to filter on the instance export rather than editing the font directly. In this way you can also have different settings for different sets of glyphs. This can be useful when dealing with relatively small paths such as  diacritics or punctuation. Sample:
 
 ```
 Angularize; segsize:120; detail:True;
