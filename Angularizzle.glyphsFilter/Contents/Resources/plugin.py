@@ -9,6 +9,7 @@ import copy
 
 class Angularize(FilterWithDialog):
 
+	@objc.python_method
 	def settings(self):
 		self.name = 'Angularizzle'
 		self.menuName = 'Angularizzle'
@@ -17,11 +18,12 @@ class Angularize(FilterWithDialog):
 		self.w = Window((windowWidth, windowHeight))
 		self.w.group = Group((0, 0, windowWidth, windowHeight))
 		self.w.group.titlesize = TextBox((20, 20, -10, 17), "Min segment:")
-		self.w.group.inputSize = EditText((115, 18, 80, 25), "80", callback=self.editTextCallback)
-		self.w.group.checkBox = CheckBox((20, 55, -10, 17), "Keep detail", value=True, callback=self.editTextCallback)
+		self.w.group.inputSize = EditText((115, 18, 80, 25), "80", callback=self.editTextCallback_)
+		self.w.group.checkBox = CheckBox((20, 55, -10, 17), "Keep detail", value=True, callback=self.editTextCallback_)
 		self.dialog = self.w.group.getNSView()
 
 	#main filter
+	@objc.python_method
 	def filter(self, layer, inEditView, customParameters):
 
 		global segsize, detail
@@ -35,7 +37,7 @@ class Angularize(FilterWithDialog):
 			try:
 				segsize = customParameters.get("segsize")
 				detail = customParameters.get("detail")
-				print "found custom params ", segsize, detail
+				print("found custom params ", segsize, detail)
 
 				if detail == "True":
 					detail = True
@@ -51,7 +53,7 @@ class Angularize(FilterWithDialog):
 
 		segsize = int(segsize)
 
-		print "working..."
+		print("working...")
 
 		global stepnum, tStepSize
 		segsize = int(segsize)
@@ -62,7 +64,7 @@ class Angularize(FilterWithDialog):
 
 		font.disableUpdateInterface()
 
-		if thisgl.paths > 0:
+		if len(thisgl.paths) > 0:
 
 			thisgl.color = 8 #purple
 			ang = self.ReturnNodesAlongPath(thisgl.paths, angsize)
@@ -87,6 +89,7 @@ class Angularize(FilterWithDialog):
 		Glyphs.defaults['com.LNP.Angularizzle.checkBox'] = self.w.group.checkBox.get()
 
 	# On dialog show
+	@objc.python_method
 	def start(self):
 
 		# Set default setting if not present
@@ -101,13 +104,14 @@ class Angularize(FilterWithDialog):
 		self.w.group.checkBox.set(Glyphs.defaults['com.LNP.Angularizzle.checkBox'])
 
 	# Action triggered by UI
-	def editTextCallback(self, sender):
+	def editTextCallback_(self, sender):
 		self.update()
 
 	def generateCustomParameter(self):
 		return "%s; segsize:%s; detail:%s;" % (self.__class__.__name__, Glyphs.defaults['com.LNP.Angularizzle.inputSize'], Glyphs.defaults['com.LNP.Angularizzle.checkBox'])
 
-	def StripDetail (self, nlist, segsize):
+	@objc.python_method
+	def StripDetail(self, nlist, segsize):
 
 		newList = list()
 
@@ -137,7 +141,7 @@ class Angularize(FilterWithDialog):
 
 		return newList
 
-	def DoIt(self, sender):
+	def DoIt_(self, sender):
 		segsize = self.w.inputSize.get()
 		detail = self.w.checkBox.get()
 		if int(segsize) > 4:
@@ -146,6 +150,7 @@ class Angularize(FilterWithDialog):
 			pass
 
 	# Remove any duplicate points from list
+	@objc.python_method
 	def RemoveDuplicatePts(self, ptlist):
 		ptl = []
 		for i in ptlist:
@@ -156,6 +161,7 @@ class Angularize(FilterWithDialog):
 		return ptl
 
 	# the main return t postion on curve script p0, 1, 2, 3 is segment
+	@objc.python_method
 	def GetPoint(self, p0, p1, p2, p3, t):
 
 		ax = self.lerp([p0[0], p1[0]], t)
@@ -176,6 +182,7 @@ class Angularize(FilterWithDialog):
 		return calc
 
 	# Put all the xy coords of linear t GetPoint() increments in list
+	@objc.python_method
 	def CreatePointList(self, p0, p1, p2, p3):
 		pl = list()
 		tmp = 0
@@ -187,14 +194,17 @@ class Angularize(FilterWithDialog):
 		return pl
 
 	#Clear layer except components
+	@objc.python_method
 	def ClearScreen(self, clearlayer):
-		clearlayer.paths = None
+		clearlayer.shapes = None
 
+	@objc.python_method
 	def lerp(self, v, d):
 		return v[0] * (1 - d) + v[1] * d
 
 	# create distance look up list from pointlist so we can determine a % position along spine
 	# each item represents cumulative distances from beginning of segments
+	@objc.python_method
 	def CreateDistList(self, pointlist):
 
 		lookup = list()
@@ -215,6 +225,7 @@ class Angularize(FilterWithDialog):
 
 	#find at which index the desired length matches to determine nearest t step value
 	#return new precise t value between the two indexes desiredlen falls
+	@objc.python_method
 	def FindPosInDistList(self, lookup, newlen): #newlen = length along curve
 
 		for s in range (0, len(lookup) - 1):
@@ -231,6 +242,7 @@ class Angularize(FilterWithDialog):
 				return (newt)
 
 	# Draw new angular path from list
+	@objc.python_method
 	def ListToPath(self, ptlist, isopen):
 		np = GSPath()
 		if isopen == True and len(ptlist) > 2: del ptlist[-1]
@@ -243,6 +255,7 @@ class Angularize(FilterWithDialog):
 			np.closed = isopen
 		return np
 
+	@objc.python_method
 	def PointToPointSteps(self, tp0, tp1, spacebetween):
 
 		n1x, n1y, n2x, n2y = tp0[0], tp0[1], tp1[0], tp1[1]
@@ -266,6 +279,7 @@ class Angularize(FilterWithDialog):
 		return tmplist
 
 	# returns nodes along a curve at intervals of space between
+	@objc.python_method
 	def ReturnNodesAlongPath(self, GlyphStartPaths, spacebetween):
 
 		allPaths = list()
