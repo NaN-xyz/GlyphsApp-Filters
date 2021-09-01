@@ -190,6 +190,7 @@ class Angularize(FilterWithDialog):
 	def ClearScreen(self, clearlayer):
 		clearlayer.paths = None
 
+	@objc.python_method
 	def lerp(self, v, d):
 		return v[0] * (1 - d) + v[1] * d
 
