@@ -7,7 +7,7 @@ import math
 import copy
 
 
-class Angularize(FilterWithDialog):
+class Angularizzle(FilterWithDialog):
 
 	@objc.python_method
 	def settings(self):
