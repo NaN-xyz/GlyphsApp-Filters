@@ -1,10 +1,11 @@
 # encoding: utf-8
 
-from GlyphsApp.plugins import *
-from GlyphsApp import *
-from vanilla import *
+from GlyphsApp.plugins import FilterWithDialog
+from GlyphsApp import Glyphs, GSPath, GSNode, GSLINE, GSCURVE
+from vanilla import Window, Group, TextBox, EditText, CheckBox
 import math
-import copy
+import objc
+from Foundation import NSPoint
 
 
 class Angularizzle(FilterWithDialog):
@@ -58,18 +59,18 @@ class Angularizzle(FilterWithDialog):
 		global stepnum, tStepSize
 		segsize = int(segsize)
 		stepnum = 130
-		tStepSize = 1.0 / stepnum # !impt
+		tStepSize = 1.0 / stepnum  # !impt
 		font = Glyphs.font
 		angsize = int(segsize)
 
 		font.disableUpdateInterface()
 
-		if thisgl.paths > 0:
+		if len(thisgl.paths) > 0:
 
-			thisgl.color = 8 #purple
+			thisgl.color = 8  #purple
 			ang = self.ReturnNodesAlongPath(thisgl.paths, angsize)
-				
-			if detail == False:
+
+			if not detail:
 				ang = self.StripDetail(ang, segsize)
 
 			if ang:
@@ -123,7 +124,7 @@ class Angularizzle(FilterWithDialog):
 			p1x = nlist[0][0]
 			p1y = nlist[0][1]
 
-			for n in range(1, len(nlist)-1):
+			for n in range(1, len(nlist) - 1):
 
 				p2x = nlist[n][0]
 				p2y = nlist[n][1]
@@ -179,7 +180,7 @@ class Angularizzle(FilterWithDialog):
 		pl = list()
 		tmp = 0
 		while tmp < 1:
-			t = tmp
+			# t = tmp
 			calc = self.GetPoint(p0, p1, p2, p3, tmp)
 			pl.append(calc)
 			tmp = tmp + tStepSize
@@ -202,7 +203,7 @@ class Angularizzle(FilterWithDialog):
 		lookup = list()
 		totallength = 0
 
-		for tp in range (0, len(pointlist) - 1):
+		for tp in range(0, len(pointlist) - 1):
 			p1x = pointlist[tp][0]
 			p1y = pointlist[tp][1]
 			p2x = pointlist[tp + 1][0]
@@ -210,7 +211,7 @@ class Angularizzle(FilterWithDialog):
 			dist = math.hypot(p2x - p1x, p2y - p1y)
 			totallength += dist
 			lookup.append(totallength)
-			
+
 		lookup.insert(0, 0)
 
 		return lookup
@@ -218,9 +219,9 @@ class Angularizzle(FilterWithDialog):
 	#find at which index the desired length matches to determine nearest t step value
 	#return new precise t value between the two indexes desiredlen falls
 	@objc.python_method
-	def FindPosInDistList(self, lookup, newlen): #newlen = length along curve
+	def FindPosInDistList(self, lookup, newlen):  #newlen = length along curve
 
-		for s in range (0, len(lookup) - 1):
+		for s in range(0, len(lookup) - 1):
 
 			b1 = lookup[s]
 			b2 = lookup[s + 1]
@@ -237,12 +238,13 @@ class Angularizzle(FilterWithDialog):
 	@objc.python_method
 	def ListToPath(self, ptlist, isopen):
 		np = GSPath()
-		if isopen == True and len(ptlist) > 2: del ptlist[-1]
-		if len(ptlist) > 2: #so counters don't devolve completely
+		if isopen and len(ptlist) > 2:
+			del ptlist[-1]
+		if len(ptlist) > 2:  #so counters don't devolve completely
 			for pt in ptlist:
 				newnode = GSNode()
 				newnode.type = GSLINE
-				newnode.position = (pt[0], pt[1])
+				newnode.position = NSPoint(pt[0], pt[1])
 				np.nodes.append(newnode)
 			np.closed = isopen
 		return np
@@ -282,24 +284,26 @@ class Angularizzle(FilterWithDialog):
 			allpointslist = []
 			scount = 0
 			index = -1
-			
-			if path.closed == False:
+
+			if not path.closed:
 				continue
 
 			for node in path.nodes:
-	
+
 				scount += 1
 				index += 1
 				node = path.nodes[index]
 
 				# if straight segment
-				if node.type == LINE:
+				if node.type == GSLINE:
 
-					if scount < 1: continue
+					if scount < 1:
+						continue
 
 					prevNode = path.nodes[index - 1]
 
-					if not prevNode: continue
+					if not prevNode:
+						continue
 
 					tp0 = (prevNode.position.x, prevNode.position.y)
 					tp1 = (node.position.x, node.position.y)
@@ -307,11 +311,12 @@ class Angularizzle(FilterWithDialog):
 					dist = math.hypot(tp1[0] - tp0[0], tp1[1] - tp0[1])
 					pathTotalLength += dist
 					straightlinepts = self.PointToPointSteps(tp0, tp1, spacebetween)
-					for sl in straightlinepts: allpointslist.append(sl)
-				
+					for sl in straightlinepts:
+						allpointslist.append(sl)
+
 				# if bezier curve segment
-				elif node.type == CURVE:
-				
+				elif node.type == GSCURVE:
+
 					prevNode = path.nodes[index - 3]
 
 					tp0 = (prevNode.position.x, prevNode.position.y)
@@ -330,7 +335,7 @@ class Angularizzle(FilterWithDialog):
 						stepinc = totallength / steps
 						steps = int(math.floor(totallength / spacebetween))
 						stepinc = totallength / steps
-						dlen = 0 # distance to check in list of distances
+						dlen = 0  # distance to check in list of distances
 
 						for s in range(0, steps + 1):
 
@@ -340,10 +345,10 @@ class Angularizzle(FilterWithDialog):
 								newt = 1
 							else:
 								newt = self.FindPosInDistList(lookup, dlen)
-							
+
 							calc = self.GetPoint(tp0, tp1, tp2, tp3, newt)
 							allpointslist.append(calc)
-							dlen+=stepinc
+							dlen += stepinc
 					else:
 						allpointslist.append([tp0[0], tp0[1]])
 						allpointslist.append([tp3[0], tp3[1]])
